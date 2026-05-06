@@ -12,6 +12,8 @@ func New(h *handler.AuthHandler) http.Handler {
 
 	// Auth routes
 	mux.HandleFunc("POST /rest/api/v1/auth/login", h.Login)
+	mux.HandleFunc("GET /rest/api/v1/auth/terms", h.GetTerms)
+	mux.HandleFunc("POST /rest/api/v1/auth/terms/accept", h.AcceptTerms)
 
 	// Health check
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {

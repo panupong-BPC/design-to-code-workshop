@@ -5,12 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
-
-	"golang.org/x/crypto/bcrypt"
+	"time"
 
 	"oneks-auth-bff-service/internal/model"
 	"oneks-auth-bff-service/internal/service"
-	"time"
 )
 
 // Mock repository
@@ -29,9 +27,15 @@ func (m *mockUserRepo) FindByUserID(ctx context.Context, userID string) (*model.
 	return nil, sql.ErrNoRows
 }
 
-func hashedPassword(plain string) string {
-	h, _ := bcrypt.GenerateFromPassword([]byte(plain), bcrypt.DefaultCost)
-	return string(h)
+// mockTermsRepo is a no-op mock for TermsRepository used in unit tests.
+type mockTermsRepo struct{}
+
+func (m *mockTermsRepo) GetTermsAcceptance(ctx context.Context, userID string) (*model.TermsAcceptanceEntity, error) {
+	return nil, sql.ErrNoRows
+}
+
+func (m *mockTermsRepo) CreateTermsAcceptance(ctx context.Context, entity *model.TermsAcceptanceEntity) error {
+	return nil
 }
 
 func TestLogin_Success(t *testing.T) {
@@ -39,7 +43,7 @@ func TestLogin_Success(t *testing.T) {
 		user: &model.UserEntity{
 			ID:           1,
 			UserID:       "admin",
-			PasswordHash: hashedPassword("password123"),
+			PasswordHash: "password123",
 			FullName:     "System Administrator",
 			Role:         "admin",
 			BranchCode:   "HQ001",
@@ -49,7 +53,7 @@ func TestLogin_Success(t *testing.T) {
 			UpdatedAt:    time.Now(),
 		},
 	}
-	svc := service.NewAuthService(repo, "test-secret", 24*time.Hour)
+	svc := service.NewAuthService(repo, &mockTermsRepo{}, "test-secret", 24*time.Hour)
 
 	result, err := svc.Login(context.Background(), model.LoginRequest{
 		UserID:   "admin",
@@ -74,11 +78,11 @@ func TestLogin_InvalidPassword(t *testing.T) {
 		user: &model.UserEntity{
 			ID:           1,
 			UserID:       "admin",
-			PasswordHash: hashedPassword("password123"),
+			PasswordHash: "password123",
 			IsActive:     true,
 		},
 	}
-	svc := service.NewAuthService(repo, "test-secret", 24*time.Hour)
+	svc := service.NewAuthService(repo, &mockTermsRepo{}, "test-secret", 24*time.Hour)
 
 	_, err := svc.Login(context.Background(), model.LoginRequest{
 		UserID:   "admin",
@@ -93,7 +97,7 @@ func TestLogin_UserNotFound(t *testing.T) {
 	repo := &mockUserRepo{
 		err: sql.ErrNoRows,
 	}
-	svc := service.NewAuthService(repo, "test-secret", 24*time.Hour)
+	svc := service.NewAuthService(repo, &mockTermsRepo{}, "test-secret", 24*time.Hour)
 
 	_, err := svc.Login(context.Background(), model.LoginRequest{
 		UserID:   "nonexistent",
@@ -109,11 +113,11 @@ func TestLogin_AccountLocked(t *testing.T) {
 		user: &model.UserEntity{
 			ID:           1,
 			UserID:       "locked",
-			PasswordHash: hashedPassword("password123"),
+			PasswordHash: "password123",
 			IsActive:     false,
 		},
 	}
-	svc := service.NewAuthService(repo, "test-secret", 24*time.Hour)
+	svc := service.NewAuthService(repo, &mockTermsRepo{}, "test-secret", 24*time.Hour)
 
 	_, err := svc.Login(context.Background(), model.LoginRequest{
 		UserID:   "locked",
@@ -128,7 +132,7 @@ func TestLogin_RepoError(t *testing.T) {
 	repo := &mockUserRepo{
 		err: fmt.Errorf("db connection failed"),
 	}
-	svc := service.NewAuthService(repo, "test-secret", 24*time.Hour)
+	svc := service.NewAuthService(repo, &mockTermsRepo{}, "test-secret", 24*time.Hour)
 
 	_, err := svc.Login(context.Background(), model.LoginRequest{
 		UserID:   "admin",

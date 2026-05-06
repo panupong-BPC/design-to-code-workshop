@@ -19,7 +19,7 @@ CREATE INDEX IF NOT EXISTS idx_users_user_id ON "USERS" ("USER_ID");
 -- Generate with: echo -n "password123" | htpasswd -bnBC 10 "" - | tr -d ':\n' | sed 's/$2y/$2a/'
 INSERT INTO "USERS" ("USER_ID", "PASSWORD_HASH", "FULL_NAME", "ROLE", "BRANCH_CODE", "BRANCH_NAME")
 VALUES (
-    'admin',
+    'admin@admin.com',
     'admin',
     'System Administrator',
     'admin',

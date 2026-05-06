@@ -22,3 +22,16 @@ type APIResponse struct {
 	Data    any    `json:"data,omitempty"`
 	Message string `json:"message"`
 }
+
+// TermsSection represents a single section of the terms and conditions.
+type TermsSection struct {
+	Heading string `json:"heading"`
+	Body    string `json:"body"`
+}
+
+// TermsContentResponse holds the full terms and conditions content.
+type TermsContentResponse struct {
+	Title       string         `json:"title"`
+	LastUpdated string         `json:"lastUpdated"`
+	Sections    []TermsSection `json:"sections"`
+}

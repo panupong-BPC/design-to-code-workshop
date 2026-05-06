@@ -1,179 +1,204 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { TranslationKey } from "@/lib/data";
+import { z } from "zod";
+import { Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { TopNavBar } from "@/components/top-nav-bar";
+import { useLanguage } from "@/contexts/language-context";
 import { useLogin } from "@/features/login/hooks/use-login";
+import { cn } from "@/lib/utils";
+
+const loginSchema = (t: (key: TranslationKey) => string) =>
+  z.object({
+    email: z.string().email(t("loginEmailError")),
+    password: z.string().min(1, t("loginPasswordError")),
+  });
+
+type LoginFormValues = {
+  email: string;
+  password: string;
+};
 
 export function LoginPage() {
+  const { t } = useLanguage();
   const { handleLogin, isLoading, error } = useLogin();
-  const [userId, setUserId] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    handleLogin({ userId, password });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema(t)),
+    defaultValues: { email: "", password: "" },
+  });
+
+  function onSubmit(values: LoginFormValues) {
+    handleLogin(values);
   }
 
-  const activeFieldBackground = "color-mix(in srgb, var(--color-brand) 4%, var(--color-background))";
-
-    
   return (
-    <div
-      className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-8"
-      style={{ background: "var(--color-background)" }}
-    >
-      <div className="w-full max-w-[768px]">
-        <div className="text-center">
-          <h2
-            className="text-[30px] font-bold leading-[1.02] tracking-[-0.04em] sm:text-[36px]"
-            style={{ fontFamily: "var(--font-display)", color: "var(--color-text-primary)" }}
-          >
-            Krungsri - One Corporate Portal
-          </h2>
-        </div>
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form onSubmit={onSubmit} noValidate className="space-y-6">
-          
-          {error && (
-            <div
-              role="alert"
-              className="mb-6 flex items-start gap-3 rounded-2xl px-4 py-3"
-              style={{
-                background: "var(--color-danger-tertiary)",
-                border: "1px solid var(--color-danger-secondary)",
-              }}
-            >
-              <svg viewBox="0 0 20 20" className="mt-0.5 h-4 w-4 shrink-0" style={{ fill: "var(--color-danger)" }}>
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-5.75a.75.75 0 001.5 0V8a.75.75 0 00-1.5 0v4.25zm.75 2.5a1 1 0 110-2 1 1 0 010 2z" clipRule="evenodd" />
-              </svg>
-              <p className="text-sm leading-6" style={{ color: "var(--color-text-danger-primary)" }}>
+    <div className="flex min-h-screen flex-col" style={{ background: "var(--surface-tinted)" }}>
+      <TopNavBar showAccount={false} />
+
+      <main className="flex flex-1 items-center justify-center px-4 pt-16">
+        <div className="w-full max-w-[380px]">
+          <div className="rounded-2xl border border-border bg-white px-6 py-8 shadow-xl">
+            {/* Logo cluster */}
+            <div className="mb-6 flex flex-col items-center gap-3">
+              <BrandMark />
+              <span className="font-headline text-xl font-bold text-primary">
+                {t("appName")}
+              </span>
+            </div>
+
+            {/* Server-level error */}
+            {error && (
+              <div
+                role="alert"
+                className="mb-5 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+              >
                 {error}
-              </p>
-            </div>
-          )}
-
-          <div
-            className="overflow-hidden rounded-[18px] border"
-            style={{
-              borderColor: "var(--color-border-secondary)",
-              background: "var(--color-background)",
-              boxShadow: "0 12px 30px color-mix(in srgb, var(--palette-big-stone-950) 7%, transparent)",
-            }}
-          >
-            <div
-              className="transition-colors duration-150"
-              style={{
-                background: focusedField === "userId" ? activeFieldBackground : "var(--color-background)",
-              }}
-            >
-              <label htmlFor="userId" className="sr-only">
-                User ID
-              </label>
-              <input
-                id="userId"
-                type="text"
-                autoComplete="username"
-                autoFocus
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                placeholder="User ID"
-                disabled={isLoading}
-                className="block h-[68px] w-full bg-transparent px-5 text-lg outline-none transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60 sm:h-[72px] sm:px-6 sm:text-[20px]"
-                style={{
-                  color: "var(--color-text-primary)",
-                  fontFamily: "var(--font-body)",
-                }}
-                onFocus={() => setFocusedField("userId")}
-                onBlur={() => setFocusedField(null)}
-              />
-            </div>
-
-            <div className="h-px w-full" style={{ background: "var(--color-border)" }} />
-
-            <div
-              className="transition-colors duration-150"
-              style={{
-                background: focusedField === "password" ? activeFieldBackground : "var(--color-background)",
-              }}
-            >
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                disabled={isLoading}
-                className="block h-[68px] w-full bg-transparent px-5 text-lg outline-none transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60 sm:h-[72px] sm:px-6 sm:text-[20px]"
-                style={{
-                  color: "var(--color-text-primary)",
-                  fontFamily: "var(--font-body)",
-                }}
-                onFocus={() => setFocusedField("password")}
-                onBlur={() => setFocusedField(null)}
-              />
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 sm:mt-8">
-            <label
-              className="inline-flex items-center gap-4 text-base sm:text-[18px]"
-              style={{ color: "var(--color-text-primary)", fontFamily: "var(--font-body)" }}
-            >
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                disabled={isLoading}
-                className="h-8 w-8 rounded-[10px] border-[1.5px] disabled:cursor-not-allowed"
-                style={{
-                  accentColor: "var(--palette-brand-600)",
-                  borderColor: "var(--color-border-secondary)",
-                }}
-              />
-              <span className="leading-none">Remember me</span>
-            </label>
-
-            <a
-              href="#"
-              onClick={(event) => event.preventDefault()}
-              className="text-base font-semibold transition-opacity duration-150 hover:opacity-80 sm:text-[18px]"
-              style={{ color: "var(--palette-brand-600)", fontFamily: "var(--font-body)" }}
-            >
-              Forgot password?
-            </a>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading || !userId || !password}
-            className="mt-10 flex h-[68px] w-full items-center justify-center gap-2 rounded-[16px] px-4 text-lg font-semibold text-white transition-all duration-150 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 sm:h-[72px] sm:text-[20px]"
-            style={{
-              background: "linear-gradient(90deg, var(--palette-brand-600) 0%, var(--palette-brand-500) 100%)",
-              boxShadow: "0 16px 30px color-mix(in srgb, var(--palette-brand-600) 24%, transparent)",
-              fontFamily: "var(--font-display)",
-            }}
-          >
-            {isLoading ? (
-              <>
-                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                </svg>
-                Signing in…
-              </>
-            ) : (
-              "Sign in"
+              </div>
             )}
-          </button>
-        </form>
-      </div>
 
-      </div>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+              {/* Email */}
+              <div className="space-y-1">
+                <Label htmlFor="email" className="font-body text-sm font-medium text-foreground">
+                  {t("loginEmailLabel")}
+                </Label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  autoFocus
+                  placeholder={t("loginEmailPlaceholder")}
+                  aria-label={t("loginEmailLabel")}
+                  disabled={isLoading}
+                  {...register("email")}
+                  className={cn(
+                    "block h-11 w-full rounded-lg border bg-white px-3 font-body text-sm text-foreground outline-none transition-colors",
+                    "placeholder:text-muted-foreground",
+                    "focus:border-primary focus:ring-2 focus:ring-primary/20",
+                    "disabled:cursor-not-allowed disabled:opacity-60",
+                    errors.email ? "border-destructive" : "border-border"
+                  )}
+                />
+                {errors.email && (
+                  <p className="text-xs text-destructive">{errors.email.message}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="space-y-1">
+                <Label htmlFor="password" className="font-body text-sm font-medium text-foreground">
+                  {t("loginPasswordLabel")}
+                </Label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    placeholder={t("loginPasswordPlaceholder")}
+                    aria-label={t("loginPasswordLabel")}
+                    disabled={isLoading}
+                    {...register("password")}
+                    className={cn(
+                      "block h-11 w-full rounded-lg border bg-white px-3 pr-10 font-body text-sm text-foreground outline-none transition-colors",
+                      "placeholder:text-muted-foreground",
+                      "focus:border-primary focus:ring-2 focus:ring-primary/20",
+                      "disabled:cursor-not-allowed disabled:opacity-60",
+                      errors.password ? "border-destructive" : "border-border"
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-xs text-destructive">{errors.password.message}</p>
+                )}
+              </div>
+
+              {/* CTA */}
+              <Button
+                type="submit"
+                disabled={isLoading}
+                aria-label="login.form.button.submit"
+                className="mt-2 h-11 w-full font-headline text-base font-semibold"
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                    {t("loginButtonText")}
+                  </>
+                ) : (
+                  t("loginButtonText")
+                )}
+              </Button>
+            </form>
+
+            {/* Forgot password row */}
+            <p className="mt-4 text-center font-body text-sm text-muted-foreground">
+              {t("loginForgotPasswordText")}{" "}
+              <a
+                href="#"
+                onClick={(e) => e.preventDefault()}
+                className="font-medium text-primary underline hover:opacity-80"
+              >
+                {t("loginResetPasswordLink")}
+              </a>
+            </p>
+
+            {/* Register row */}
+            <p className="mt-2 text-center font-body text-sm text-muted-foreground">
+              {t("loginNewMemberText")}{" "}
+              <a
+                href="#"
+                onClick={(e) => e.preventDefault()}
+                className="font-medium text-primary underline hover:opacity-80"
+              >
+                {t("loginRegisterLink")}
+              </a>
+            </p>
+          </div>
+        </div>
+      </main>
     </div>
-   );
+  );
 }
+
+function BrandMark() {
+  return (
+    <svg
+      width="36"
+      height="36"
+      viewBox="0 0 36 36"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <rect width="36" height="36" rx="8" fill="hsl(var(--primary))" />
+      <rect x="8" y="10" width="20" height="3" rx="1.5" fill="white" />
+      <rect x="8" y="16.5" width="20" height="3" rx="1.5" fill="white" />
+      <rect x="8" y="23" width="20" height="3" rx="1.5" fill="white" />
+    </svg>
+  );
+}
+
+

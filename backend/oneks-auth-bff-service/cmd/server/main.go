@@ -45,7 +45,8 @@ func main() {
 
 	// Wire dependencies
 	repo := repository.NewUserRepository(db)
-	svc := service.NewAuthService(repo, cfg.JWTSecret, jwtExpiry)
+	termsRepo := repository.NewTermsRepository(db)
+	svc := service.NewAuthService(repo, termsRepo, cfg.JWTSecret, jwtExpiry)
 	h := handler.NewAuthHandler(svc)
 
 	// Start server

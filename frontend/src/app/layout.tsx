@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
-import '../theme/globals.scss'; // Adjusted path to correctly locate the theme styles
+import { Cabin, Mukta } from "next/font/google";
+import '../theme/globals.scss';
 import { cn } from "@/lib/utils";
 import { LanguageProvider } from "@/contexts/language-context";
 
-const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-inter" });
-const spaceGrotesk = Space_Grotesk({
+const cabin = Cabin({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  variable: "--font-cabin",
+  weight: ["400", "500", "600", "700"],
+});
+const mukta = Mukta({
+  subsets: ["latin"],
+  variable: "--font-mukta",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -25,13 +30,12 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body
         className={cn(
           "min-h-screen bg-background font-body antialiased",
-          plusJakartaSans.variable,
-          spaceGrotesk.variable
+          cabin.variable,
+          mukta.variable
         )}
       >
         <LanguageProvider>

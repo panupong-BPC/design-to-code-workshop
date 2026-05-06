@@ -330,7 +330,26 @@ export const translations = {
   "jobInfo.action.edit": { en: "Edit", th: "แก้ไข" },
   "jobInfo.action.cancel": { en: "Cancel", th: "ยกเลิก" },
   "jobInfo.action.back": { en: "Back", th: "กลับ" },
-  "jobInfo.action.submit": { en: "Submit", th: "ส่ง" }
+  "jobInfo.action.submit": { en: "Submit", th: "ส่ง" },
+  // Login Feature
+  loginEmailLabel: { en: "Email", th: "อีเมล" },
+  loginEmailPlaceholder: { en: "Email", th: "อีเมล" },
+  loginEmailError: { en: "Please enter a valid email address", th: "กรุณากรอกอีเมลที่ถูกต้อง" },
+  loginPasswordLabel: { en: "Password", th: "รหัสผ่าน" },
+  loginPasswordPlaceholder: { en: "Password", th: "รหัสผ่าน" },
+  loginPasswordError: { en: "Password is required", th: "กรุณากรอกรหัสผ่าน" },
+  loginButtonText: { en: "Log in", th: "เข้าสู่ระบบ" },
+  loginForgotPasswordText: { en: "Forgot Password?", th: "ลืมรหัสผ่าน?" },
+  loginResetPasswordLink: { en: "Reset Password", th: "รีเซ็ตรหัสผ่าน" },
+  loginNewMemberText: { en: "New member?", th: "สมาชิกใหม่?" },
+  loginRegisterLink: { en: "Register", th: "ลงทะเบียน" },
+  // Terms Feature
+  termsTitle: { en: "Terms and conditions", th: "ข้อตกลงและเงื่อนไข" },
+  termsLastUpdated: { en: "Last updated: 10/10/2025", th: "อัปเดตล่าสุด: 10/10/2025" },
+  termsAcceptLabel: { en: "I accepted term and conditions", th: "ฉันยอมรับข้อตกลงและเงื่อนไข" },
+  termsNextButton: { en: "Next", th: "ถัดไป" },
+  // App-wide
+  appName: { en: "Lending Hub", th: "Lending Hub" },
 };
 
 export type TranslationKey = keyof typeof translations;

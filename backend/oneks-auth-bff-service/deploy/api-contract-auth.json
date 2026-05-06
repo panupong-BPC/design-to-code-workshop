@@ -1,0 +1,105 @@
+{
+  "featureName": "auth",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/rest/api/v1/auth/login",
+      "summary": "Authenticate user",
+      "requestSchema": "LoginRequest",
+      "responseSchema": "LoginResponse",
+      "auth": "public"
+    },
+    {
+      "method": "GET",
+      "path": "/rest/api/v1/auth/terms",
+      "summary": "Retrieve terms and conditions",
+      "requestSchema": null,
+      "responseSchema": "TermsContentResponse",
+      "auth": "public"
+    },
+    {
+      "method": "POST",
+      "path": "/rest/api/v1/auth/terms/accept",
+      "summary": "Accept terms and conditions",
+      "requestSchema": "TermsAcceptRequest",
+      "responseSchema": "APIResponse",
+      "auth": "bearer"
+    }
+  ],
+  "fieldMapping": [
+    {
+      "jsonField": "userId",
+      "goStruct": "LoginRequest.UserID",
+      "tsInterface": "LoginRequest['userId']",
+      "direction": "UI→API"
+    },
+    {
+      "jsonField": "password",
+      "goStruct": "LoginRequest.Password",
+      "tsInterface": "LoginRequest['password']",
+      "direction": "UI→API"
+    },
+    {
+      "jsonField": "token",
+      "goStruct": "LoginResponse.Token",
+      "tsInterface": "LoginResponse['token']",
+      "direction": "API→UI"
+    },
+    {
+      "jsonField": "expiresAt",
+      "goStruct": "LoginResponse.ExpiresAt",
+      "tsInterface": "LoginResponse['expiresAt']",
+      "direction": "API→UI"
+    },
+    {
+      "jsonField": "user",
+      "goStruct": "LoginResponse.User",
+      "tsInterface": "LoginResponse['user']",
+      "direction": "API→UI"
+    },
+    {
+      "jsonField": "title",
+      "goStruct": "TermsContentResponse.Title",
+      "tsInterface": "TermsContentResponse['title']",
+      "direction": "API→UI"
+    },
+    {
+      "jsonField": "lastUpdated",
+      "goStruct": "TermsContentResponse.LastUpdated",
+      "tsInterface": "TermsContentResponse['lastUpdated']",
+      "direction": "API→UI"
+    },
+    {
+      "jsonField": "sections",
+      "goStruct": "TermsContentResponse.Sections",
+      "tsInterface": "TermsContentResponse['sections']",
+      "direction": "API→UI"
+    },
+    {
+      "jsonField": "acceptedAt",
+      "goStruct": "TermsAcceptRequest.AcceptedAt",
+      "tsInterface": "TermsAcceptRequest['acceptedAt']",
+      "direction": "UI→API"
+    }
+  ],
+  "errorCodes": [
+    {
+      "entry": "INVALID_REQUEST",
+      "code": "B400",
+      "title": "Invalid request",
+      "message": "The request payload is invalid or missing required fields."
+    },
+    {
+      "entry": "UNAUTHORIZED",
+      "code": "B401",
+      "title": "Unauthorized",
+      "message": "Authentication failed or token is missing/invalid."
+    },
+    {
+      "entry": "INTERNAL_ERROR",
+      "code": "B500",
+      "title": "Server error",
+      "message": "An unexpected error occurred on the server."
+    }
+  ]
+}

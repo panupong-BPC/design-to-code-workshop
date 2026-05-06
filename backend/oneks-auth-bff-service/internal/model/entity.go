@@ -15,3 +15,11 @@ type UserEntity struct {
 	CreatedAt    time.Time `db:"CREATED_AT"`
 	UpdatedAt    time.Time `db:"UPDATED_AT"`
 }
+
+// TermsAcceptanceEntity represents a terms acceptance record in the database.
+type TermsAcceptanceEntity struct {
+	ID         int64     `db:"ID"`
+	UserID     string    `db:"USER_ID"`
+	AcceptedAt time.Time `db:"ACCEPTED_AT"`
+	CreatedAt  time.Time `db:"CREATED_AT"`
+}

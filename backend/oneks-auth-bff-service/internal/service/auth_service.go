@@ -15,16 +15,19 @@ import (
 )
 
 const logPrefix = constant.LogPrefix
+const termsLogPrefix = constant.TermsLogPrefix
 
 type AuthService struct {
 	repo      repository.UserRepository
+	termsRepo repository.TermsRepository
 	jwtSecret []byte
 	jwtExpiry time.Duration
 }
 
-func NewAuthService(repo repository.UserRepository, jwtSecret string, jwtExpiry time.Duration) *AuthService {
+func NewAuthService(repo repository.UserRepository, termsRepo repository.TermsRepository, jwtSecret string, jwtExpiry time.Duration) *AuthService {
 	return &AuthService{
 		repo:      repo,
+		termsRepo: termsRepo,
 		jwtSecret: []byte(jwtSecret),
 		jwtExpiry: jwtExpiry,
 	}
@@ -74,6 +77,65 @@ func (s *AuthService) Login(ctx context.Context, req model.LoginRequest) (*model
 			BranchName: user.BranchName,
 		},
 	}, nil
+}
+
+func (s *AuthService) GetTerms(ctx context.Context) (*model.TermsContentResponse, error) {
+	slog.InfoContext(ctx, termsLogPrefix+" GetTerms started")
+	return &model.TermsContentResponse{
+		Title:       "Terms and conditions",
+		LastUpdated: "10/10/2025",
+		Sections: []model.TermsSection{
+			{Heading: "Purchases", Body: "When you make a purchase through our platform, you agree to provide accurate and complete information. All purchases are subject to product availability and our pricing terms, which may change without notice. We reserve the right to refuse or cancel any order at our discretion."},
+			{Heading: "Subscriptions", Body: "Subscription services are billed on a recurring basis. You may cancel your subscription at any time through your account settings. Cancellation will take effect at the end of the current billing period, and no refunds will be issued for the remaining period."},
+			{Heading: "Content", Body: "All content provided through this platform, including text, graphics, images, and data, is the exclusive property of One Corporate Portal or its licensors. You may not reproduce, distribute, or create derivative works without prior written consent."},
+			{Heading: "Links To Other Web Sites", Body: "Our platform may contain links to third-party websites. These links are provided for your convenience only. We have no control over and accept no responsibility for the content or availability of any linked sites. Accessing third-party links is at your own risk."},
+			{Heading: "Changes", Body: "We reserve the right to update or modify these Terms and Conditions at any time without prior notice. Continued use of the platform after any such changes constitutes your acceptance of the new terms. We encourage you to review these terms periodically."},
+			{Heading: "Contact Us", Body: "If you have any questions about these Terms and Conditions, please contact our support team at support@onecorporateportal.com or through the Help and Support section within the platform."},
+		},
+	}, nil
+}
+
+func (s *AuthService) AcceptTerms(ctx context.Context, tokenString string, req model.TermsAcceptRequest) error {
+	slog.InfoContext(ctx, termsLogPrefix+" AcceptTerms started")
+
+	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, apperror.Unauthorized("unexpected signing method")
+		}
+		return s.jwtSecret, nil
+	})
+	if err != nil || !token.Valid {
+		slog.WarnContext(ctx, termsLogPrefix+" AcceptTerms invalid token")
+		return apperror.Unauthorized(constant.ErrUnauthorized.Message)
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return apperror.Unauthorized(constant.ErrUnauthorized.Message)
+	}
+
+	userID, ok := claims["sub"].(string)
+	if !ok || userID == "" {
+		return apperror.Unauthorized(constant.ErrUnauthorized.Message)
+	}
+
+	acceptedAt, err := time.Parse(time.RFC3339, req.AcceptedAt)
+	if err != nil {
+		return apperror.BadRequest("invalid acceptedAt format, expected RFC3339")
+	}
+
+	entity := &model.TermsAcceptanceEntity{
+		UserID:     userID,
+		AcceptedAt: acceptedAt,
+	}
+
+	if err := s.termsRepo.CreateTermsAcceptance(ctx, entity); err != nil {
+		slog.ErrorContext(ctx, termsLogPrefix+" AcceptTerms repo error", "error", err)
+		return apperror.Internal(constant.ErrTermsAcceptanceFailed.Message)
+	}
+
+	slog.InfoContext(ctx, termsLogPrefix+" AcceptTerms completed", "userId", userID)
+	return nil
 }
 
 func (s *AuthService) generateToken(user *model.UserEntity, expiresAt time.Time) (string, error) {

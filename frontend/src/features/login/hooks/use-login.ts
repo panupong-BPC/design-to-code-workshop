@@ -15,16 +15,14 @@ export function useLogin() {
     setError(null);
 
     try {
-      const result = await loginAction(values);
+      const result = await loginAction({ userId: values.email, password: values.password });
       if (!result.success) {
         setError(result.message);
         return;
       }
-      // Keep token + user in sessionStorage for client-side apiFetch calls.
       sessionStorage.setItem("auth_token", result.token);
       sessionStorage.setItem("auth_user", JSON.stringify(result.user));
-      // loginAction already set the HttpOnly cookie → middleware will allow access.
-      router.push("/welcome");
+      router.push("/terms-and-conditions");
       router.refresh();
     } finally {
       setIsLoading(false);

@@ -854,3 +854,173 @@ export interface SubmitJob200Response {
      */
     message?: string;
 }
+
+/**
+ * 
+ * @export
+ * @interface LoginRequest
+ */
+export interface LoginRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginRequest
+     */
+    userId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginRequest
+     */
+    password: string;
+}
+
+/**
+ * 
+ * @export
+ * @interface LoginResponse
+ */
+export interface LoginResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginResponse
+     */
+    token?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginResponse
+     */
+    expiresAt?: string;
+    /**
+     * 
+     * @type {UserResponse}
+     * @memberof LoginResponse
+     */
+    user?: UserResponse;
+}
+
+/**
+ * 
+ * @export
+ * @interface UserResponse
+ */
+export interface UserResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResponse
+     */
+    userId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResponse
+     */
+    fullName?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResponse
+     */
+    role?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResponse
+     */
+    branchCode?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResponse
+     */
+    branchName?: string;
+}
+
+/**
+ * 
+ * @export
+ * @interface TermsContent
+ */
+export interface TermsContent {
+    /**
+     * 
+     * @type {string}
+     * @memberof TermsContent
+     */
+    title?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TermsContent
+     */
+    lastUpdated?: string;
+    /**
+     * 
+     * @type {Array<TermsSection>}
+     * @memberof TermsContent
+     */
+    sections?: Array<TermsSection>;
+}
+
+/**
+ * 
+ * @export
+ * @interface TermsSection
+ */
+export interface TermsSection {
+    /**
+     * 
+     * @type {string}
+     * @memberof TermsSection
+     */
+    heading?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TermsSection
+     */
+    body?: string;
+}
+
+/**
+ * 
+ * @export
+ * @interface TermsAcceptRequest
+ */
+export interface TermsAcceptRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof TermsAcceptRequest
+     */
+    acceptedAt: string;
+}
+
+/**
+ * 
+ * @export
+ * @interface TermsResponse
+ */
+export interface TermsResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof TermsResponse
+     */
+    status?: string;
+    /**
+     * 
+     * @type {TermsContent}
+     * @memberof TermsResponse
+     */
+    data?: TermsContent;
+    /**
+     * 
+     * @type {string}
+     * @memberof TermsResponse
+     */
+    message?: string;
+}
