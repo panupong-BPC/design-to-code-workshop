@@ -330,7 +330,13 @@ export const translations = {
   "jobInfo.action.edit": { en: "Edit", th: "แก้ไข" },
   "jobInfo.action.cancel": { en: "Cancel", th: "ยกเลิก" },
   "jobInfo.action.back": { en: "Back", th: "กลับ" },
-  "jobInfo.action.submit": { en: "Submit", th: "ส่ง" }
+  "jobInfo.action.submit": { en: "Submit", th: "ส่ง" },
+  // Terms and Conditions Feature
+  termsTitle: { en: "Terms and conditions", th: "ข้อกำหนดและเงื่อนไข" },
+  termsLastUpdated: { en: "Last updated: 10/10/2025", th: "อัปเดตล่าสุด: 10/10/2025" },
+  termsAcceptCheckbox: { en: "I accepted term and conditions", th: "ฉันยอมรับข้อกำหนดและเงื่อนไข" },
+  termsNextButton: { en: "Next", th: "ถัดไป" },
+  termsBrandName: { en: "Lending Hub", th: "Lending Hub" },
 };
 
 export type TranslationKey = keyof typeof translations;
